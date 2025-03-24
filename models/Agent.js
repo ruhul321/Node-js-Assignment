@@ -1,4 +1,3 @@
-// models/Agent.js
 const mongoose = require("mongoose");
 
 const agentSchema = new mongoose.Schema({

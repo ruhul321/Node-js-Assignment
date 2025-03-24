@@ -16,7 +16,6 @@ const moment = require("moment");
     );
     console.log("Worker thread connected to MongoDB");
 
-    // Import models only after connection is established.
     const Agent = require("../models/Agent");
     const User = require("../models/User");
     const Account = require("../models/Account");
@@ -28,14 +27,11 @@ const moment = require("moment");
     fs.createReadStream(workerData.filePath)
       .pipe(csv())
       .on("data", (data) => {
-        // Log CSV keys to verify header names (remove after verification)
-        //console.log(Object.keys(data));
         results.push(data);
       })
       .on("end", async () => {
         try {
           for (const row of results) {
-            // Parse the date of birth using the correct header 'dob'
             const dobString = row["dob"];
             if (!dobString) {
               console.error(`DOB not provided for email ${row["email"]}`);
@@ -54,7 +50,6 @@ const moment = require("moment");
             }
             const validDOB = dobMoment.toDate();
 
-            // Parse policy start and end dates using correct headers
             const policyStartString = row["policy_start_date"];
             const policyEndString = row["policy_end_date"];
             const startMoment = moment(
@@ -76,14 +71,12 @@ const moment = require("moment");
             const validPolicyStart = startMoment.toDate();
             const validPolicyEnd = endMoment.toDate();
 
-            // Insert or update Agent info using 'agent'
             const agent = await Agent.findOneAndUpdate(
               { name: row["agent"] },
               { name: row["agent"] },
               { upsert: true, new: true }
             );
 
-            // Insert or update User info using 'firstname', 'dob', etc.
             const user = await User.findOneAndUpdate(
               { email: row["email"] },
               {
@@ -100,28 +93,24 @@ const moment = require("moment");
               { upsert: true, new: true }
             );
 
-            // Insert or update Account info using 'account_name'
             const account = await Account.findOneAndUpdate(
               { accountName: row["account_name"] },
               { accountName: row["account_name"] },
               { upsert: true, new: true }
             );
 
-            // Insert or update LOB (Policy Category) using 'category_name'
             const lob = await LOB.findOneAndUpdate(
               { categoryName: row["category_name"] },
               { categoryName: row["category_name"] },
               { upsert: true, new: true }
             );
 
-            // Insert or update Policy Carrier using 'company_name'
             const carrier = await Carrier.findOneAndUpdate(
               { companyName: row["company_name"] },
               { companyName: row["company_name"] },
               { upsert: true, new: true }
             );
 
-            // Create Policy Info using the mapped fields
             const policy = new Policy({
               policyNumber: row["policy_number"],
               policyStartDate: validPolicyStart,

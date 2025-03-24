@@ -1,4 +1,3 @@
-// models/Carrier.js
 const mongoose = require("mongoose");
 
 const carrierSchema = new mongoose.Schema({

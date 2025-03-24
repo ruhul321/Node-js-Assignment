@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const multer = require("multer");
 const { Worker } = require("worker_threads");
@@ -7,7 +6,6 @@ const schedule = require("node-schedule");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
-// MongoDB connection (adjust URI as needed)
 mongoose.connect(
   "mongodb+srv://ruhulc334:ZVi53MWYX4kk9VRt@cluster0.2qo9m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
   {
@@ -19,7 +17,6 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
 
-// Import models (ensure these files export the respective Mongoose models)
 const Agent = require("./models/Agent");
 const User = require("./models/User");
 const Account = require("./models/Account");
@@ -31,7 +28,6 @@ const Message = require("./models/Message");
 const app = express();
 app.use(bodyParser.json());
 
-// Configure multer for file uploads.
 const upload = multer({ dest: "uploads/" });
 
 // ==========================
@@ -41,7 +37,6 @@ const upload = multer({ dest: "uploads/" });
 // 1. Upload API (uses worker thread to process file upload)
 app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded");
-  // Create a worker thread to process the CSV/Excel file
   const worker = new Worker("./workers/csvWorker.js", {
     workerData: { filePath: req.file.path },
   });
@@ -119,10 +114,9 @@ setInterval(() => {
   console.log(`CPU Usage (approx): ${cpuUsagePercent.toFixed(2)}%`);
   if (cpuUsagePercent > 70) {
     console.warn("CPU usage above threshold. Restarting server...");
-    // You might want to gracefully shutdown here and let a process manager restart the service.
     process.exit(1);
   }
-}, 5000); // Check every 5 seconds
+}, 5000);
 
 // 2. Post-service for scheduling message insertion
 app.post("/post-message", async (req, res) => {
@@ -130,13 +124,11 @@ app.post("/post-message", async (req, res) => {
   if (!message || !day || !time)
     return res.status(400).send("Message, day, and time are required");
 
-  // Construct the Date object for the scheduled job.
   const scheduledDate = new Date(`${day} ${time}`);
   if (scheduledDate < new Date()) {
     return res.status(400).send("Scheduled time must be in the future");
   }
 
-  // Schedule the job using node-schedule.
   schedule.scheduleJob(scheduledDate, async () => {
     try {
       const newMessage = new Message({ message, scheduledAt: scheduledDate });

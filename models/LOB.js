@@ -1,4 +1,3 @@
-// models/LOB.js
 const mongoose = require("mongoose");
 
 const lobSchema = new mongoose.Schema({
