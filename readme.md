@@ -20,20 +20,24 @@ This is a Node.js-based backend application that processes insurance policy data
 
 ## API Endpoints
 1. **Upload a CSV/XLSX file**
-
-POST /upload (Processes and stores data into MongoDB)
+    
+      POST /upload (Processes and stores data into MongoDB)
 
 2. **Search users and policies by username or email**
-GET /search?username=<name>
+   
+     GET /search?username=<name>
 
-GET /search?email=<email>
+     GET /search?email=<email>
 
 3. **Aggregate policies grouped by users**
-GET /aggregatedPolicy
+   
+     GET /aggregatedPolicy
 
 4. **Schedule a message to be inserted later**
-   POST /post-message 
 
-Schedule a message to be inserted later
-POST /post-message
-Example request body:
+     POST /post-message 
+
+5. **Schedule a message to be inserted later**
+   
+     POST /post-message
+
